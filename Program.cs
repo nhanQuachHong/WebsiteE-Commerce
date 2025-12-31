@@ -1,7 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<WebsiteE_Commerce.Data.QuanLyHangHoaContext>(optionsAction =>
+{
+    optionsAction.UseSqlServer(builder.Configuration.GetConnectionString("QuanLyHangHoa"));
+});
 
 var app = builder.Build();
 
