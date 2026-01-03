@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using WebsiteE_Commerce.Data;
 
 public class AccountController : Controller
 {
@@ -16,3 +17,4 @@ public class AccountController : Controller
         _signInManager = signInManager;
         _roleManager = roleManager;
     }
+}

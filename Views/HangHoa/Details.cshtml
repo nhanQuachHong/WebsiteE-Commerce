@@ -1,84 +1,61 @@
-@model WebsiteE_Commerce.Data.HangHoa
+﻿@model WebsiteE_Commerce.Data.HangHoa
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết sản phẩm";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="text-info">Chi tiết hàng hóa</h1>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model?.MaHh" class="btn btn-warning">Chỉnh sửa</a>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+    </div>
 
-<div>
-    <h4>HangHoa</h4>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TenHh)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TenHh)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TenAlias)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TenAlias)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MoTaDonVi)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MoTaDonVi)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DonGia)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DonGia)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Hinh)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Hinh)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NgaySx)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NgaySx)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GiamGia)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GiamGia)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SoLanXem)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SoLanXem)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MoTa)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MoTa)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaLoaiNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaLoaiNavigation.MaLoai)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaNccNavigation)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaNccNavigation.MaNcc)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.MaHh">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+    <div class="row">
+        <div class="col-md-4 text-center border-end">
+            <h5 class="text-muted">Hình ảnh sản phẩm</h5>
+            <div class="mt-3">
+                <img src="~/images/@(string.IsNullOrEmpty(Model.Hinh) ? "no-image.png" : Model.Hinh)"
+                     class="img-fluid rounded shadow-sm"
+                     style="max-height: 350px; object-fit: contain;"
+                     alt="@Model.TenHh" />
+            </div>
+            <p class="mt-2 small text-secondary">File: @Model.Hinh</p>
+        </div>
+
+        <div class="col-md-8">
+            <dl class="row px-3">
+                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.TenHh)</dt>
+                <dd class="col-sm-8 fw-bold text-primary">@Html.DisplayFor(model => model.TenHh)</dd>
+
+                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.DonGia)</dt>
+                <dd class="col-sm-8 text-danger fw-bold">@Model.DonGia?.ToString("#,##0") đ</dd>
+
+                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.GiamGia)</dt>
+                <dd class="col-sm-8">@Model.GiamGia%</dd>
+
+                <dt class="col-sm-4">Danh mục</dt>
+                <dd class="col-sm-8">@Model.MaLoaiNavigation?.TenLoai</dd>
+
+                <dt class="col-sm-4">Nhà cung cấp</dt>
+                <dd class="col-sm-8">@Model.MaNccNavigation?.TenCongTy</dd>
+
+                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.MoTaDonVi)</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.MoTaDonVi)</dd>
+
+                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.NgaySx)</dt>
+                <dd class="col-sm-8">@Model.NgaySx.ToString("dd/MM/yyyy")</dd>
+
+                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.SoLanXem)</dt>
+                <dd class="col-sm-8"><span class="badge bg-secondary">@Model.SoLanXem</span></dd>
+
+                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.MoTa)</dt>
+                <dd class="col-sm-8 text-muted italic">@Html.DisplayFor(model => model.MoTa)</dd>
+            </dl>
+        </div>
+    </div>
 </div>
