@@ -21,6 +21,7 @@
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 		<link href="css/tiny-slider.css" rel="stylesheet">
 		<link href="css/style.css" rel="stylesheet">
+		<link href="css/search.css" rel="stylesheet">
 		<title>Furni Free Bootstrap 5 Template for Furniture and Interior Design Websites by Untree.co </title>
 	</head>
 
@@ -65,15 +66,79 @@
 						<div class="col-lg-5">
 							<div class="intro-excerpt">
 								<h1>Shop</h1>
+								<p></p>
+								<p><a href="" class="btn btn-secondary me-2">Shop Now</a><a href="#" class="btn btn-white-outline">Explore</a></p>
 							</div>
-						</div>
-						<div class="col-lg-7">
-							
 						</div>
 					</div>
 				</div>
 			</div>
 		<!-- End Hero Section -->
+
+		<!-- ===== THANH SEARCH - CHÈN VÀO ĐÂY ===== -->
+	<div class="untree_co-section pt-5 pb-3">
+		<div class="container">
+			<div class="search-container">
+				<div class="search-wrapper">
+					<div class="search-box">
+						<span class="search-icon">🔍</span>
+						<input 
+							type="text" 
+							class="search-input" 
+							placeholder="Tìm kiếm bàn, ghế, tủ, giường..."
+							id="searchInput"
+							autocomplete="off"
+						>
+						<button class="clear-btn" id="clearBtn">✕</button>
+						<button class="search-btn" id="searchBtn">Tìm kiếm</button>
+					</div>
+				</div>
+
+				<div class="filters">
+					<div class="filter-group">
+						<label class="filter-label">Danh mục</label>
+						<select id="categoryFilter">
+							<option value="">Tất cả</option>
+							<option value="living-room">Phòng khách</option>
+							<option value="bedroom">Phòng ngủ</option>
+							<option value="dining-room">Phòng ăn</option>
+							<option value="office">Văn phòng</option>
+							<option value="kitchen">Nhà bếp</option>
+							<option value="decoration">Trang trí</option>
+						</select>
+					</div>
+
+					<div class="filter-group">
+						<label class="filter-label">Loại sản phẩm</label>
+						<select id="productTypeFilter">
+							<option value="">Tất cả</option>
+							<option value="sofa">Sofa</option>
+							<option value="table">Bàn</option>
+							<option value="chair">Ghế</option>
+							<option value="bed">Giường</option>
+							<option value="wardrobe">Tủ quần áo</option>
+							<option value="cabinet">Tủ</option>
+							<option value="shelf">Kệ</option>
+						</select>
+					</div>
+
+					<div class="filter-group">
+						<label class="filter-label">Sắp xếp</label>
+						<select id="priceSort">
+							<option value="">Mặc định</option>
+							<option value="asc">Giá tăng dần</option>
+							<option value="desc">Giá giảm dần</option>
+							<option value="newest">Mới nhất</option>
+						</select>
+					</div>
+				</div>
+				
+				<!-- Dropdown gợi ý tìm kiếm -->
+				<div class="suggestions" id="suggestions"></div>
+			</div>
+		</div>
+	</div>
+	<!-- ===== KẾT THÚC THANH SEARCH ===== -->
 
 		
 
@@ -308,6 +373,7 @@
 		<script src="js/bootstrap.bundle.min.js"></script>
 		<script src="js/tiny-slider.js"></script>
 		<script src="js/custom.js"></script>
+		<script src="js/search.js"></script>
 	</body>
 
 </html>
