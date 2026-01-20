@@ -4,32 +4,9 @@ const clearBtn = document.getElementById('clearBtn');
 const searchBtn = document.getElementById('searchBtn');
 const suggestions = document.getElementById('suggestions');
 const categoryFilter = document.getElementById('categoryFilter');
-const productTypeFilter = document.getElementById('productTypeFilter');
 const priceSort = document.getElementById('priceSort');
 
 let debounceTimer;
-
-// Dữ liệu nội thất mẫu (mô phỏng database)
-const furnitureData = [
-    { name: 'Sofa Da Cao Cấp Milano', price: 15900000, category: 'living-room', type: 'sofa' },
-    { name: 'Sofa Vải Bố Hiện Đại', price: 12500000, category: 'living-room', type: 'sofa' },
-    { name: 'Bàn Ăn Gỗ Sồi 6 Ghế', price: 18900000, category: 'dining-room', type: 'table' },
-    { name: 'Bàn Ăn Mặt Đá Marble', price: 25000000, category: 'dining-room', type: 'table' },
-    { name: 'Giường Ngủ Gỗ Óc Chó', price: 22000000, category: 'bedroom', type: 'bed' },
-    { name: 'Giường Bọc Nỉ Cao Cấp', price: 16500000, category: 'bedroom', type: 'bed' },
-    { name: 'Tủ Quần Áo 3 Cánh', price: 9800000, category: 'bedroom', type: 'wardrobe' },
-    { name: 'Tủ Quần Áo Cửa Lùa', price: 14200000, category: 'bedroom', type: 'wardrobe' },
-    { name: 'Bàn Làm Việc Gỗ Công Nghiệp', price: 3500000, category: 'office', type: 'table' },
-    { name: 'Bàn Giám Đốc Gỗ Tự Nhiên', price: 8900000, category: 'office', type: 'table' },
-    { name: 'Ghế Văn Phòng Ergonomic', price: 2800000, category: 'office', type: 'chair' },
-    { name: 'Ghế Gaming Pro Series', price: 4500000, category: 'office', type: 'chair' },
-    { name: 'Kệ Tivi Gỗ Hiện Đại', price: 5200000, category: 'living-room', type: 'shelf' },
-    { name: 'Kệ Sách Đứng 5 Tầng', price: 3800000, category: 'office', type: 'shelf' },
-    { name: 'Tủ Bếp Gỗ Acrylic', price: 32000000, category: 'kitchen', type: 'cabinet' },
-    { name: 'Bàn Bar Mini Hiện Đại', price: 4200000, category: 'kitchen', type: 'table' },
-    { name: 'Ghế Ăn Bọc Nỉ Cao Cấp', price: 1800000, category: 'dining-room', type: 'chair' },
-    { name: 'Gương Trang Trí Khung Vàng', price: 2500000, category: 'decoration', type: 'decoration' }
-];
 
 // Format giá VND
 function formatPrice(price) {
@@ -48,29 +25,22 @@ searchInput.addEventListener('input', function() {
 
 // Lọc khi thay đổi filter
 categoryFilter.addEventListener('change', function() {
-    if (searchInput.value) {
-        fetchSuggestions(searchInput.value);
-    }
-});
-
-productTypeFilter.addEventListener('change', function() {
-    if (searchInput.value) {
-        fetchSuggestions(searchInput.value);
-    }
+    filterProducts();
 });
 
 priceSort.addEventListener('change', function() {
-    if (searchInput.value) {
-        fetchSuggestions(searchInput.value);
-    }
+    filterProducts();
 });
 
 // Xóa nội dung
 clearBtn.addEventListener('click', function() {
     searchInput.value = '';
+    categoryFilter.value = '';
+    priceSort.value = '';
     clearBtn.style.display = 'none';
     suggestions.style.display = 'none';
     searchInput.focus();
+    filterProducts();
 });
 
 // Ẩn suggestions khi click bên ngoài
@@ -97,16 +67,8 @@ function fetchSuggestions(query) {
     suggestions.innerHTML = '<div class="loading">Đang tìm kiếm...</div>';
     suggestions.style.display = 'block';
 
-    // ===== KHI KẾT NỐI VỚI ASP.NET, THAY ĐOẠN setTimeout BÊN DƯỚI BẰNG ĐOẠN NÀY: =====
-    /*
-    const params = new URLSearchParams({
-        searchString: query,
-        category: categoryFilter.value,
-        productType: productTypeFilter.value,
-        sort: priceSort.value
-    });
-    
-    fetch(`/Furniture/SearchSuggestions?${params}`)
+    // Gọi API ASP.NET Core
+    fetch(`/Shop/SearchSuggestions?term=${encodeURIComponent(query)}`)
         .then(response => response.json())
         .then(data => {
             displaySuggestions(data, query);
@@ -115,33 +77,6 @@ function fetchSuggestions(query) {
             console.error('Error:', error);
             suggestions.innerHTML = '<div class="loading">Lỗi kết nối</div>';
         });
-    */
-
-    // Mô phỏng lọc và sắp xếp (XÓA PHẦN NÀY KHI DÙNG API THẬT)
-    setTimeout(() => {
-        let results = furnitureData.filter(item => 
-            item.name.toLowerCase().includes(query.toLowerCase())
-        );
-
-        // Lọc theo category
-        if (categoryFilter.value) {
-            results = results.filter(p => p.category === categoryFilter.value);
-        }
-
-        // Lọc theo product type
-        if (productTypeFilter.value) {
-            results = results.filter(p => p.type === productTypeFilter.value);
-        }
-
-        // Sắp xếp
-        if (priceSort.value === 'asc') {
-            results.sort((a, b) => a.price - b.price);
-        } else if (priceSort.value === 'desc') {
-            results.sort((a, b) => b.price - a.price);
-        }
-        
-        displaySuggestions(results, query);
-    }, 300);
 }
 
 // Hiển thị gợi ý
@@ -156,7 +91,7 @@ function displaySuggestions(results, query) {
         const highlighted = product.name.replace(regex, '<span class="highlight">$1</span>');
         
         return `
-            <div class="suggestion-item" onclick='selectProduct(${JSON.stringify(product)})'>
+            <div class="suggestion-item" onclick='selectProduct(${product.id}, "${product.name.replace(/'/g, "\\'")}")'>
                 <span class="suggestion-icon">🪑</span>
                 <span class="suggestion-text">
                     ${highlighted}
@@ -173,31 +108,24 @@ function displaySuggestions(results, query) {
 }
 
 // Chọn sản phẩm từ gợi ý
-function selectProduct(product) {
-    searchInput.value = product.name;
-    suggestions.style.display = 'none';
-    clearBtn.style.display = 'block';
-    console.log('Đã chọn:', product);
-    // Có thể redirect đến trang chi tiết sản phẩm hoặc làm gì đó với sản phẩm
+function selectProduct(productId, productName) {
+    // Chuyển đến trang chi tiết sản phẩm
+    window.location.href = `/Shop/Details/${productId}`;
 }
 
 // Tìm kiếm khi nhấn nút
 searchBtn.addEventListener('click', function() {
     const query = searchInput.value.trim();
     if (query) {
-        console.log('Tìm kiếm:', {
-            query: query,
-            category: categoryFilter.value,
-            productType: productTypeFilter.value,
-            sort: priceSort.value
-        });
         suggestions.style.display = 'none';
         
-        // Chuyển đến trang kết quả tìm kiếm (nếu dùng ASP.NET)
-        // window.location.href = `/Furniture/Index?searchString=${encodeURIComponent(query)}&category=${categoryFilter.value}&productType=${productTypeFilter.value}&sort=${priceSort.value}`;
-        
-        // Hoặc hiển thị alert (để test)
-        alert('Tìm kiếm: ' + query);
+        // Chuyển đến trang kết quả tìm kiếm
+        const params = new URLSearchParams({
+            search: query,
+            category: categoryFilter.value,
+            sort: priceSort.value
+        });
+        window.location.href = `/Shop?${params.toString()}`;
     }
 });
 
@@ -207,3 +135,52 @@ searchInput.addEventListener('keypress', function(e) {
         searchBtn.click();
     }
 });
+
+// Lọc sản phẩm trên trang hiện tại (không reload)
+function filterProducts() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const selectedCategory = categoryFilter.value;
+    const selectedSort = priceSort.value;
+    const productCards = document.querySelectorAll('.product-card');
+
+    let visibleProducts = Array.from(productCards);
+
+    // Lọc theo tìm kiếm
+    if (searchTerm) {
+        visibleProducts = visibleProducts.filter(card => {
+            const name = card.dataset.name;
+            return name.includes(searchTerm);
+        });
+    }
+
+    // Lọc theo danh mục
+    if (selectedCategory) {
+        visibleProducts = visibleProducts.filter(card => {
+            return card.dataset.category === selectedCategory;
+        });
+    }
+
+    // Ẩn/hiện sản phẩm
+    productCards.forEach(card => {
+        if (visibleProducts.includes(card)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    // Sắp xếp
+    if (selectedSort && visibleProducts.length > 0) {
+        const container = document.getElementById('productList');
+        visibleProducts.sort((a, b) => {
+            const priceA = parseFloat(a.dataset.price) || 0;
+            const priceB = parseFloat(b.dataset.price) || 0;
+
+            if (selectedSort === 'asc') return priceA - priceB;
+            if (selectedSort === 'desc') return priceB - priceA;
+            return 0;
+        });
+
+        visibleProducts.forEach(card => container.appendChild(card));
+    }
+}
