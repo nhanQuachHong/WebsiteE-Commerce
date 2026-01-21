@@ -10,7 +10,7 @@ let debounceTimer;
 
 // Format giá VND
 function formatPrice(price) {
-    return new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
+    return '$' + new Intl.NumberFormat('en-US').format(price);
 }
 
 // Hiện/ẩn nút xóa

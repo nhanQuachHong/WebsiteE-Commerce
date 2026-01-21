@@ -57,7 +57,7 @@
                         <span class="search-icon">🔍</span>
                         <input type="text"
                                class="search-input"
-                               placeholder="Tìm kiếm bàn, ghế, tủ, giường..."
+                               placeholder="Tìm kiếm "
                                id="searchInput"
                                autocomplete="off">
                         <button class="clear-btn" id="clearBtn">✕</button>
@@ -117,7 +117,7 @@
                                      onerror="this.src='/images/product-1.png';"
                                      alt="@product.TenHh">
                                 <h3 class="product-title">@product.TenHh</h3>
-                                <strong class="product-price">@product.DonGia?.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</strong>
+                                <strong class="product-price">@product.DonGia?.ToString("C0", new System.Globalization.CultureInfo("en-US"))</strong>
 
                                 <span class="icon-cross">
                                     <img src="~/images/cross.svg" class="img-fluid">
