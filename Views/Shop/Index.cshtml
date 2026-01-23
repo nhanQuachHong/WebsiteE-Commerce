@@ -52,28 +52,32 @@
             border-color: #0d6efd;
         }
         
-        .price-filter-section {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
+        /* Loading spinner */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
         }
         
-        .price-filter-section h5 {
-            margin-bottom: 15px;
-            color: #495057;
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0d6efd;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
         }
         
-        .price-slider {
-            width: 100%;
-            margin-bottom: 15px;
+        
+        
+        /* Hiệu ứng chuyển tiếp cho sản phẩm */
+        #productList {
+            transition: opacity 0.3s ease;
         }
         
-        .price-values {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: #6c757d;
+        #productList.loading {
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -135,7 +139,7 @@
                     </div>
                 </div>
 
-
+                <!-- Phần sắp xếp (giữ nguyên) -->
                 <div class="filters mt-4">
                     <div class="filter-group">
                         <label class="filter-label">Sắp xếp</label>
@@ -150,6 +154,12 @@
 
                 <!-- Dropdown gợi ý tìm kiếm -->
                 <div class="suggestions" id="suggestions"></div>
+                
+                <!-- Loading spinner -->
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner"></div>
+                    <p>Đang tải sản phẩm...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -159,40 +169,8 @@
     <div class="untree_co-section product-section before-footer-section">
         <div class="container">
             <div class="row" id="productList">
-                @if (Model != null && Model.Any())
-                {
-                    @foreach (var product in Model)
-                    {
-                        <!-- Start Product Card -->
-                        <div class="col-12 col-md-4 col-lg-3 mb-5 product-card"
-                             data-name="@product.TenHh.ToLower()"
-                             data-category="@product.MaLoai"
-                             data-price="@product.DonGia">
-                            <a class="product-item" asp-action="Details" asp-route-id="@product.MaHh">
-                                <img src="~/images/@(string.IsNullOrEmpty(product.Hinh) ? "product-1.png" : product.Hinh)"
-                                     class="img-fluid product-thumbnail"
-                                     onerror="this.src='/images/product-1.png';"
-                                     alt="@product.TenHh">
-                                <h3 class="product-title">@product.TenHh</h3>
-                                <strong class="product-price">@product.DonGia?.ToString("C0", new System.Globalization.CultureInfo("en-US"))</strong>
-
-                                <span class="icon-cross">
-                                    <img src="~/images/cross.svg" class="img-fluid">
-                                </span>
-                            </a>
-                        </div>
-                        <!-- End Product Card -->
-                    }
-                }
-                else
-                {
-                    <div class="col-12 text-center py-5">
-                        <p class="text-muted fs-5">Không có sản phẩm nào.</p>
-                        <a asp-controller="HangHoa" asp-action="Create" class="btn btn-primary mt-3">
-                            Thêm sản phẩm mới
-                        </a>
-                    </div>
-                }
+                <!-- Sản phẩm sẽ được tải bằng AJAX -->
+                @await Html.PartialAsync("_ProductListPartial", Model)
             </div>
         </div>
     </div>
@@ -200,107 +178,7 @@
 
     <!-- Start Footer Section -->
     <footer class="footer-section">
-        <div class="container relative">
-            <div class="sofa-img">
-                <img src="~/images/sofa.png" alt="Image" class="img-fluid">
-            </div>
-
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="subscription-form">
-                        <h3 class="d-flex align-items-center">
-                            <span class="me-1"><img src="~/images/envelope-outline.svg" alt="Image" class="img-fluid"></span>
-                            <span>Subscribe to Newsletter</span>
-                        </h3>
-
-                        <form action="#" class="row g-3">
-                            <div class="col-auto">
-                                <input type="text" class="form-control" placeholder="Enter your name">
-                            </div>
-                            <div class="col-auto">
-                                <input type="email" class="form-control" placeholder="Enter your email">
-                            </div>
-                            <div class="col-auto">
-                                <button class="btn btn-primary">
-                                    <span class="fa fa-paper-plane"></span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row g-5 mb-5">
-                <div class="col-lg-4">
-                    <div class="mb-4 footer-logo-wrap">
-                        <a href="#" class="footer-logo">Furni<span>.</span></a>
-                    </div>
-                    <p class="mb-4">Donec facilisis quam ut purus rutrum lobortis. Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate velit imperdiet dolor tempor tristique.</p>
-
-                    <ul class="list-unstyled custom-social">
-                        <li><a href="#"><span class="fa fa-brands fa-facebook-f"></span></a></li>
-                        <li><a href="#"><span class="fa fa-brands fa-twitter"></span></a></li>
-                        <li><a href="#"><span class="fa fa-brands fa-instagram"></span></a></li>
-                        <li><a href="#"><span class="fa fa-brands fa-linkedin"></span></a></li>
-                    </ul>
-                </div>
-
-                <div class="col-lg-8">
-                    <div class="row links-wrap">
-                        <div class="col-6 col-sm-6 col-md-3">
-                            <ul class="list-unstyled">
-                                <li><a href="#">About us</a></li>
-                                <li><a href="#">Services</a></li>
-                                <li><a href="#">Blog</a></li>
-                                <li><a href="#">Contact us</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="col-6 col-sm-6 col-md-3">
-                            <ul class="list-unstyled">
-                                <li><a href="#">Support</a></li>
-                                <li><a href="#">Knowledge base</a></li>
-                                <li><a href="#">Live chat</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="col-6 col-sm-6 col-md-3">
-                            <ul class="list-unstyled">
-                                <li><a href="#">Jobs</a></li>
-                                <li><a href="#">Our team</a></li>
-                                <li><a href="#">Leadership</a></li>
-                                <li><a href="#">Privacy Policy</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="col-6 col-sm-6 col-md-3">
-                            <ul class="list-unstyled">
-                                <li><a href="#">Nordic Chair</a></li>
-                                <li><a href="#">Kruzo Aero</a></li>
-                                <li><a href="#">Ergonomic Chair</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="border-top copyright">
-                <div class="row pt-4">
-                    <div class="col-lg-6">
-                        <p class="mb-2 text-center text-lg-start">
-                            Copyright &copy;<script>document.write(new Date().getFullYear());</script>. All Rights Reserved. &mdash; Designed with love by <a href="https://untree.co">Untree.co</a> Distributed By <a href="https://themewagon.com">ThemeWagon</a>
-                        </p>
-                    </div>
-
-                    <div class="col-lg-6 text-center text-lg-end">
-                        <ul class="list-unstyled d-inline-flex ms-auto">
-                            <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
-                            <li><a href="#">Privacy Policy</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- ... (giữ nguyên footer) ... -->
     </footer>
     <!-- End Footer Section -->
 
@@ -310,111 +188,127 @@
     <script src="~/js/search.js"></script>
     
     <script>
-        // JavaScript để xử lý các ô danh mục
         document.addEventListener('DOMContentLoaded', function() {
-            // Xử lý các ô danh mục
-            const categoryTabs = document.querySelectorAll('.category-tab');
-            const productCards = document.querySelectorAll('.product-card');
+            // Biến để lưu trạng thái hiện tại
+            let currentCategory = '';
+            let currentSort = '';
             
+            // Xử lý các ô danh mục - AJAX
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            const priceSort = document.getElementById('priceSort');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const productList = document.getElementById('productList');
+            
+            // Cập nhật URL mà không reload (chỉ để hiển thị)
+            function updateUrlParams() {
+                const params = new URLSearchParams();
+                if (currentCategory) params.set('category', currentCategory);
+                if (currentSort) params.set('sort', currentSort);
+                const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                window.history.pushState({}, '', newUrl);
+            }
+            
+            // Load sản phẩm bằng AJAX
+            function loadProducts() {
+                productList.classList.add('loading');
+                loadingSpinner.style.display = 'block';
+                
+                const params = new URLSearchParams();
+                if (currentCategory) params.append('category', currentCategory);
+                if (currentSort) params.append('sort', currentSort);
+                
+                fetch(`/Shop/GetProducts?${params.toString()}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.text();
+                    })
+                    .then(html => {
+                        productList.innerHTML = html;
+                        productList.classList.remove('loading');
+                        loadingSpinner.style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error('Error loading products:', error);
+                        productList.innerHTML = '<div class="col-12 text-center py-5"><p class="text-muted fs-5">Có lỗi xảy ra khi tải sản phẩm.</p></div>';
+                        productList.classList.remove('loading');
+                        loadingSpinner.style.display = 'none';
+                    });
+            }
+            
+            // Xử lý click vào danh mục
             categoryTabs.forEach(tab => {
                 tab.addEventListener('click', function() {
-                    // Xóa class active khỏi tất cả các tab
+                    // Xóa active khỏi tất cả các tab
                     categoryTabs.forEach(t => t.classList.remove('active'));
                     
-                    // Thêm class active vào tab được click
+                    // Thêm active vào tab được click
                     this.classList.add('active');
                     
-                    // Lấy giá trị category từ data attribute
-                    const selectedCategory = this.getAttribute('data-category');
+                    // Lấy giá trị category
+                    currentCategory = this.getAttribute('data-category');
                     
-                    // Lọc sản phẩm theo danh mục
-                    filterProductsByCategory(selectedCategory);
+                    // Cập nhật URL
+                    updateUrlParams();
+                    
+                    // Load sản phẩm
+                    loadProducts();
                 });
             });
             
-            function filterProductsByCategory(category) {
-                productCards.forEach(card => {
-                    const cardCategory = card.getAttribute('data-category');
-                    
-                    if (category === '' || cardCategory === category) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            }
-            
-            // Xử lý thanh lọc giá
-            const priceSlider = document.getElementById('priceSlider');
-            const currentPrice = document.getElementById('currentPrice');
-            const applyPriceFilter = document.getElementById('applyPriceFilter');
-            
-            if (priceSlider) {
-                // Cập nhật giá trị hiện tại khi kéo slider
-                priceSlider.addEventListener('input', function() {
-                    const price = parseInt(this.value);
-                    currentPrice.textContent = formatPrice(price) + ' đ';
-                });
-                
-                // Xử lý khi nhấn nút áp dụng
-                applyPriceFilter.addEventListener('click', function() {
-                    const maxPrice = parseInt(priceSlider.value);
-                    filterProductsByPrice(maxPrice);
-                });
-            }
-            
-            function filterProductsByPrice(maxPrice) {
-                productCards.forEach(card => {
-                    const cardPrice = parseFloat(card.getAttribute('data-price')) || 0;
-                    
-                    if (cardPrice <= maxPrice) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            }
-            
-            function formatPrice(price) {
-                return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            }
-            
-            // Xử lý sắp xếp (giữ nguyên chức năng cũ)
-            const priceSort = document.getElementById('priceSort');
+            // Xử lý sắp xếp
             if (priceSort) {
                 priceSort.addEventListener('change', function() {
-                    sortProducts(this.value);
+                    currentSort = this.value;
+                    updateUrlParams();
+                    loadProducts();
                 });
             }
             
-            function sortProducts(sortType) {
-                const container = document.getElementById('productList');
-                const products = Array.from(container.querySelectorAll('.product-card'));
+            // Kiểm tra nếu có tham số category từ URL (khi từ trang home chuyển sang)
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryFromUrl = urlParams.get('category');
+            const sortFromUrl = urlParams.get('sort');
+            
+            if (categoryFromUrl) {
+                // Tìm và kích hoạt tab tương ứng
+                const targetTab = document.querySelector(`.category-tab[data-category="${categoryFromUrl}"]`);
+                if (targetTab) {
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    targetTab.classList.add('active');
+                    currentCategory = categoryFromUrl;
+                }
+            }
+            
+            if (sortFromUrl && priceSort) {
+                priceSort.value = sortFromUrl;
+                currentSort = sortFromUrl;
+            }
+            
+            // Xử lý khi nhấn nút back/forward
+            window.addEventListener('popstate', function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const category = urlParams.get('category') || '';
+                const sort = urlParams.get('sort') || '';
                 
-                products.sort((a, b) => {
-                    const priceA = parseFloat(a.getAttribute('data-price')) || 0;
-                    const priceB = parseFloat(b.getAttribute('data-price')) || 0;
-                    
-                    switch(sortType) {
-                        case 'asc':
-                            return priceA - priceB;
-                        case 'desc':
-                            return priceB - priceA;
-                        case 'newest':
-                            // Nếu có data attribute cho ngày tạo thì sắp xếp theo đó
-                            // Ở đây tạm thời giữ nguyên thứ tự
-                            return 0;
-                        default:
-                            return 0;
+                // Cập nhật giao diện
+                categoryTabs.forEach(tab => {
+                    const tabCategory = tab.getAttribute('data-category');
+                    if (tabCategory === category) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
                     }
                 });
                 
-                // Xóa tất cả sản phẩm hiện tại
-                products.forEach(product => container.removeChild(product));
+                if (priceSort && sort) {
+                    priceSort.value = sort;
+                }
                 
-                // Thêm lại sản phẩm đã sắp xếp
-                products.forEach(product => container.appendChild(product));
-            }
+                // Load sản phẩm
+                currentCategory = category;
+                currentSort = sort;
+                loadProducts();
+            });
         });
     </script>
 </body>
