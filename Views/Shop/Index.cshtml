@@ -21,6 +21,61 @@
     <link href="~/css/style.css" rel="stylesheet">
     <link href="~/css/search.css" rel="stylesheet">
     <title>@ViewData["Title"]</title>
+    <style>
+        /* CSS cho các ô danh mục */
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .category-tab {
+            padding: 8px 16px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: #495057;
+        }
+        
+        .category-tab:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .category-tab.active {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+        }
+        
+        .price-filter-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .price-filter-section h5 {
+            margin-bottom: 15px;
+            color: #495057;
+        }
+        
+        .price-slider {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .price-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
 </head>
 
 <body>
@@ -65,21 +120,23 @@
                     </div>
                 </div>
 
-                <div class="filters">
-                    <div class="filter-group">
-                        <label class="filter-label">Danh mục</label>
-                        <select id="categoryFilter">
-                            <option value="">Tất cả</option>
-                            @if (ViewBag.Categories != null)
+                <!-- Phần các ô danh mục -->
+                <div class="category-tabs-container mt-4">
+                    <h5 class="mb-3">Danh mục sản phẩm</h5>
+                    <div class="category-tabs" id="categoryTabs">
+                        <div class="category-tab active" data-category="">Tất cả</div>
+                        @if (ViewBag.Categories != null)
+                        {
+                            @foreach (var category in ViewBag.Categories)
                             {
-                                @foreach (var category in ViewBag.Categories)
-                                {
-                                    <option value="@category.MaLoai">@category.TenLoai</option>
-                                }
+                                <div class="category-tab" data-category="@category.MaLoai">@category.TenLoai</div>
                             }
-                        </select>
+                        }
                     </div>
+                </div>
 
+
+                <div class="filters mt-4">
                     <div class="filter-group">
                         <label class="filter-label">Sắp xếp</label>
                         <select id="priceSort">
@@ -251,5 +308,114 @@
     <script src="~/js/tiny-slider.js"></script>
     <script src="~/js/custom.js"></script>
     <script src="~/js/search.js"></script>
+    
+    <script>
+        // JavaScript để xử lý các ô danh mục
+        document.addEventListener('DOMContentLoaded', function() {
+            // Xử lý các ô danh mục
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            const productCards = document.querySelectorAll('.product-card');
+            
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Xóa class active khỏi tất cả các tab
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Thêm class active vào tab được click
+                    this.classList.add('active');
+                    
+                    // Lấy giá trị category từ data attribute
+                    const selectedCategory = this.getAttribute('data-category');
+                    
+                    // Lọc sản phẩm theo danh mục
+                    filterProductsByCategory(selectedCategory);
+                });
+            });
+            
+            function filterProductsByCategory(category) {
+                productCards.forEach(card => {
+                    const cardCategory = card.getAttribute('data-category');
+                    
+                    if (category === '' || cardCategory === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Xử lý thanh lọc giá
+            const priceSlider = document.getElementById('priceSlider');
+            const currentPrice = document.getElementById('currentPrice');
+            const applyPriceFilter = document.getElementById('applyPriceFilter');
+            
+            if (priceSlider) {
+                // Cập nhật giá trị hiện tại khi kéo slider
+                priceSlider.addEventListener('input', function() {
+                    const price = parseInt(this.value);
+                    currentPrice.textContent = formatPrice(price) + ' đ';
+                });
+                
+                // Xử lý khi nhấn nút áp dụng
+                applyPriceFilter.addEventListener('click', function() {
+                    const maxPrice = parseInt(priceSlider.value);
+                    filterProductsByPrice(maxPrice);
+                });
+            }
+            
+            function filterProductsByPrice(maxPrice) {
+                productCards.forEach(card => {
+                    const cardPrice = parseFloat(card.getAttribute('data-price')) || 0;
+                    
+                    if (cardPrice <= maxPrice) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+            
+            function formatPrice(price) {
+                return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Xử lý sắp xếp (giữ nguyên chức năng cũ)
+            const priceSort = document.getElementById('priceSort');
+            if (priceSort) {
+                priceSort.addEventListener('change', function() {
+                    sortProducts(this.value);
+                });
+            }
+            
+            function sortProducts(sortType) {
+                const container = document.getElementById('productList');
+                const products = Array.from(container.querySelectorAll('.product-card'));
+                
+                products.sort((a, b) => {
+                    const priceA = parseFloat(a.getAttribute('data-price')) || 0;
+                    const priceB = parseFloat(b.getAttribute('data-price')) || 0;
+                    
+                    switch(sortType) {
+                        case 'asc':
+                            return priceA - priceB;
+                        case 'desc':
+                            return priceB - priceA;
+                        case 'newest':
+                            // Nếu có data attribute cho ngày tạo thì sắp xếp theo đó
+                            // Ở đây tạm thời giữ nguyên thứ tự
+                            return 0;
+                        default:
+                            return 0;
+                    }
+                });
+                
+                // Xóa tất cả sản phẩm hiện tại
+                products.forEach(product => container.removeChild(product));
+                
+                // Thêm lại sản phẩm đã sắp xếp
+                products.forEach(product => container.appendChild(product));
+            }
+        });
+    </script>
 </body>
 </html>
