@@ -1,0 +1,36 @@
+@model IEnumerable<WebsiteE_Commerce.Data.HangHoa>
+
+@if (Model != null && Model.Any())
+{
+    @foreach (var product in Model)
+    {
+        <!-- Start Product Card -->
+        <div class="col-12 col-md-4 col-lg-3 mb-5 product-card"
+             data-name="@product.TenHh.ToLower()"
+             data-category="@product.MaLoai"
+             data-price="@product.DonGia">
+            <a class="product-item" href="/Shop/Details/@product.MaHh">
+                <img src="~/images/@(string.IsNullOrEmpty(product.Hinh) ? "product-1.png" : product.Hinh)"
+                     class="img-fluid product-thumbnail"
+                     onerror="this.src='/images/product-1.png';"
+                     alt="@product.TenHh">
+                <h3 class="product-title">@product.TenHh</h3>
+                <strong class="product-price">@product.DonGia?.ToString("C0", new System.Globalization.CultureInfo("en-US"))</strong>
+
+                <span class="icon-cross">
+                    <img src="~/images/cross.svg" class="img-fluid">
+                </span>
+            </a>
+        </div>
+        <!-- End Product Card -->
+    }
+}
+else
+{
+    <div class="col-12 text-center py-5">
+        <p class="text-muted fs-5">Không có sản phẩm nào.</p>
+        <a href="/HangHoa/Create" class="btn btn-primary mt-3">
+            Thêm sản phẩm mới
+        </a>
+    </div>
+}
