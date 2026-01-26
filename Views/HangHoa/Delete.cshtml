@@ -1,46 +1,62 @@
 ﻿@model WebsiteE_Commerce.Data.HangHoa
 
 @{
-    ViewData["Title"] = "Xác nhận xóa sản phẩm";
+    ViewData["Title"] = "Xóa sản phẩm";
 }
 
-<div class="container mt-4">
-    <div class="alert alert-danger d-flex align-items-center">
-        <h2 class="mb-0">⚠️ Bạn có chắc chắn muốn xóa sản phẩm này không?</h2>
-    </div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa sản phẩm</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning text-center">
+                        <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa sản phẩm này?
+                    </div>
 
-    <div class="row mt-4">
-        <div class="col-md-4 text-center border-end">
-            <div class="p-3">
-                <h5 class="text-danger">Hình ảnh xác nhận</h5>
-                <img src="~/images/@(string.IsNullOrEmpty(Model.Hinh) ? "no-image.png" : Model.Hinh)"
-                     class="img-thumbnail mt-2 shadow-sm"
-                     style="max-width: 100%; height: auto; filter: grayscale(100%); opacity: 0.8;" />
-                <p class="text-muted mt-2 small">Tên file: @Model.Hinh</p>
+                    <div class="row mt-4">
+                        <div class="col-md-4 text-center">
+                            <img src="~/images/@(string.IsNullOrEmpty(Model.Hinh) ? "no-image.png" : Model.Hinh)"
+                                 class="img-thumbnail rounded shadow-sm"
+                                 style="width: 100%; max-height: 250px; object-fit: contain;"
+                                 onerror="this.src='/images/no-image.png'" />
+                            <p class="text-muted mt-2 small fst-italic">@Model.Hinh</p>
+                        </div>
+
+                        <div class="col-md-8">
+                            <h3 class="text-primary">@Model.TenHh</h3>
+                            <hr />
+                            <dl class="row">
+                                <dt class="col-sm-4">Mã hàng hóa:</dt>
+                                <dd class="col-sm-8">#@Model.MaHh</dd>
+
+                                <dt class="col-sm-4">Đơn giá:</dt>
+                                <dd class="col-sm-8 fw-bold text-danger">@Model.DonGia?.ToString("#,##0") đ</dd>
+
+                                <dt class="col-sm-4">Danh mục:</dt>
+                                <dd class="col-sm-8">@(Model.MaLoaiNavigation?.TenLoai ?? "---")</dd>
+
+                                <dt class="col-sm-4">Nhà cung cấp:</dt>
+                                <dd class="col-sm-8">@(Model.MaNccNavigation?.TenCongTy ?? "---")</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light d-flex justify-content-end gap-2">
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="MaHh" />
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Hủy bỏ
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Xóa ngay
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
-
-        <div class="col-md-8 px-4">
-            <h4 class="text-secondary border-bottom pb-2">Thông tin hàng hóa</h4>
-            <dl class="row mt-3">
-                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.TenHh)</dt>
-                <dd class="col-sm-8">@Html.DisplayFor(model => model.TenHh)</dd>
-
-                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.DonGia)</dt>
-                <dd class="col-sm-8">@Model.DonGia?.ToString("#,##0") đ</dd>
-
-                <dt class="col-sm-4">Danh mục</dt>
-                <dd class="col-sm-8">@Model.MaLoaiNavigation?.TenLoai</dd>
-
-                <dt class="col-sm-4">@Html.DisplayNameFor(model => model.MoTa)</dt>
-                <dd class="col-sm-8 text-muted">@Html.DisplayFor(model => model.MoTa)</dd>
-            </dl>
-
-            <form asp-action="Delete" class="mt-4 border-top pt-3">
-                <input type="hidden" asp-for="MaHh" />
-                <button type="submit" class="btn btn-danger px-4 me-2">Xác nhận Xóa</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Hủy và quay lại</a>
-            </form>
         </div>
     </div>
 </div>

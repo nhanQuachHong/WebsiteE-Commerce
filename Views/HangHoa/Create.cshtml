@@ -1,67 +1,74 @@
 ﻿@model WebsiteE_Commerce.Data.HangHoa
 
 @{
-    ViewData["Title"] = "Create hang hoa";
+    ViewData["Title"] = "Thêm mới sản phẩm";
 }
 
 <div class="container mt-4">
-    <h2 class="text-primary">Create</h2>
-    <hr />
-    <form asp-action="Create" method="post" id="createForm">
-        @Html.AntiForgeryToken() <div class="row">
-            <div class="col-md-7">
+    <div class="card shadow border-0">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">Thêm mới sản phẩm</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                <div class="form-group mb-3">
-                    <label asp-for="TenHh" class="control-label">Tên sản phẩm</label>
-                    <input asp-for="TenHh" id="txtTenHh" class="form-control" placeholder="Nhập tên để kiểm tra Ajax..." />
-                    <span id="tenFeedback" class="fw-bold" style="font-size: 0.85rem;"></span>
-                </div>
-
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="MaLoai" class="control-label">Danh mục</label>
-                        <select asp-for="MaLoai" class="form-select" asp-items="ViewBag.MaLoai"></select>
+                    <div class="col-md-7">
+                        <div class="form-group mb-3">
+                            <label asp-for="TenHh" class="form-label fw-bold">Tên sản phẩm</label>
+                            <input asp-for="TenHh" class="form-control" placeholder="Nhập tên sản phẩm..." />
+                            <span asp-validation-for="TenHh" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MaLoai" class="form-label fw-bold">Danh mục</label>
+                                <select asp-for="MaLoai" class="form-select" asp-items="ViewBag.MaLoai">
+                                    <option value="">-- Chọn danh mục --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MaNcc" class="form-label fw-bold">Nhà cung cấp</label>
+                                <select asp-for="MaNcc" class="form-select" asp-items="ViewBag.MaNcc">
+                                    <option value="">-- Chọn nhà cung cấp --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="DonGia" class="form-label fw-bold">Đơn giá</label>
+                            <div class="input-group">
+                                <input asp-for="DonGia" class="form-control" type="number" />
+                                <span class="input-group-text">VNĐ</span>
+                            </div>
+                            <span asp-validation-for="DonGia" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="MoTa" class="form-label fw-bold">Mô tả ngắn</label>
+                            <textarea asp-for="MoTa" class="form-control" rows="3"></textarea>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="DonGia" class="control-label">Đơn giá</label>
-                        <input asp-for="DonGia" class="form-control" type="number" />
+
+                    <div class="col-md-5">
+                        <div class="form-group mb-3 text-center">
+                            <label asp-for="ImageFile" class="form-label fw-bold d-block">Hình ảnh đại diện</label>
+                            <img id="preview" src="~/images/no-image.png" class="img-thumbnail mb-2" style="width: 100%; max-height: 250px; object-fit: cover;" />
+
+                            <input asp-for="ImageFile" type="file" class="form-control" onchange="document.getElementById('preview').src = window.URL.createObjectURL(this.files[0])" />
+                            <span asp-validation-for="ImageFile" class="text-danger"></span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-group mb-3">
-                    <label asp-for="MoTa" class="control-label">Mô tả ngắn</label>
-                    <textarea asp-for="MoTa" class="form-control" rows="3"></textarea>
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="fas fa-save"></i> Lưu sản phẩm
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary px-4">Quay lại</a>
                 </div>
-            </div>
-
-            <div class="col-md-5 border-start">
-                <div class="form-group mb-3 text-center">
-                    <label class="control-label fw-bold d-block mb-2">Hình ảnh sản phẩm</label>
-
-                    <div class="mb-3">
-                        <img src="/images/no-image.png" id="imgPreview" class="img-thumbnail" style="width: 250px; height: 250px; object-fit: cover;" />
-                    </div>
-
-                    <input type="file" id="fileHinhAjax" class="form-control" accept="image/*" />
-
-                    <input type="hidden" asp-for="Hinh" id="hinhPath" />
-
-                    <small class="text-muted mt-2 d-block italic">Ảnh sẽ được tự động upload khi bạn chọn.</small>
-                </div>
-            </div>
+            </form>
         </div>
-
-        <div class="form-group mt-4 border-top pt-3">
-            <button type="submit" id="btnSubmit" class="btn btn-success px-5">Lưu sản phẩm</button>
-            <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
-        </div>
-    </form>
+    </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script src="~/js/thanh_ajax.js"></script>
-}

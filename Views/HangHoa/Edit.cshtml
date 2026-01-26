@@ -5,46 +5,98 @@
 }
 
 <div class="container mt-4">
-    <h2 class="text-warning">Chỉnh sửa: @Model.TenHh</h2>
-    <hr />
-    <form asp-action="Edit" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input type="hidden" asp-for="MaHh" />
-
-        <div class="row">
-            <div class="col-md-7">
-                <div class="form-group mb-3">
-                    <label asp-for="TenHh" class="control-label">Tên sản phẩm</label>
-                    <input asp-for="TenHh" class="form-control" id="txtTenHh" />
-                    <span id="tenFeedback"></span>
-                </div>
-                <div class="form-group mb-3">
-                    <label asp-for="DonGia" class="control-label">Giá bán</label>
-                    <input asp-for="DonGia" class="form-control" />
-                </div>
-            </div>
-
-            <div class="col-md-5 text-center">
-                <label class="fw-bold">Ảnh hiện tại</label>
-                <div class="mb-3">
-                    <img src="~/images/@(string.IsNullOrEmpty(Model.Hinh) ? "no-image.png" : Model.Hinh)"
-                         id="imgPreview" class="img-thumbnail" style="width:250px;" />
-                </div>
-                <input type="file" id="fileHinhAjax" class="form-control" />
-                <input type="hidden" asp-for="Hinh" id="hinhPath" />
-            </div>
+    <div class="card shadow border-0">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0"><i class="fas fa-edit"></i> Chỉnh sửa sản phẩm</h4>
         </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="mt-4">
-            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                <input type="hidden" asp-for="MaHh" />
+                <input type="hidden" asp-for="Hinh" /> <input type="hidden" asp-for="NgaySx" /> <input type="hidden" asp-for="SoLanXem" /> <div class="row">
+                    <div class="col-md-7">
+                        <div class="form-group mb-3">
+                            <label asp-for="TenHh" class="form-label fw-bold">Tên sản phẩm</label>
+                            <input asp-for="TenHh" class="form-control" />
+                            <span asp-validation-for="TenHh" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MaLoai" class="form-label fw-bold">Danh mục</label>
+                                <select asp-for="MaLoai" class="form-select" asp-items="ViewBag.MaLoai"></select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MaNcc" class="form-label fw-bold">Nhà cung cấp</label>
+                                <select asp-for="MaNcc" class="form-select" asp-items="ViewBag.MaNcc"></select>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="DonGia" class="form-label fw-bold">Giá bán</label>
+                            <div class="input-group">
+                                <input asp-for="DonGia" class="form-control" type="number" />
+                                <span class="input-group-text">VNĐ</span>
+                            </div>
+                            <span asp-validation-for="DonGia" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="MoTa" class="form-label fw-bold">Mô tả chi tiết</label>
+                            <textarea asp-for="MoTa" class="form-control" rows="5"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5 text-center border-start ps-4">
+                        <label class="fw-bold mb-3 d-block text-primary">Hình ảnh hiện tại</label>
+
+                        <div class="mb-3 p-2 border rounded bg-light d-inline-block shadow-sm">
+                            <img src="~/images/@(string.IsNullOrEmpty(Model.Hinh) ? "no-image.png" : Model.Hinh)"
+                                 id="imgPreview"
+                                 class="img-fluid"
+                                 style="width: 100%; max-height: 250px; object-fit: contain;"
+                                 alt="Ảnh sản phẩm"
+                                 onerror="this.src='/images/no-image.png'" />
+                        </div>
+
+                        <div class="text-start mt-2">
+                            <label class="form-label small text-muted fst-italic">Chọn ảnh mới nếu muốn thay đổi:</label>
+                            <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" onchange="previewImage(this)" />
+                            <span asp-validation-for="ImageFile" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 border-top pt-3 text-end">
+                    <a asp-action="Index" class="btn btn-secondary me-2">Quay lại</a>
+                    <button type="submit" class="btn btn-warning px-4 fw-bold">
+                        <i class="fas fa-save"></i> Lưu thay đổi
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/thanh_ajax.js"></script>
+
+    <script>
+        // Hàm preview ảnh bằng Javascript thuần (không cần jQuery)
+        function previewImage(input) {
+            var preview = document.getElementById('imgPreview');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 }

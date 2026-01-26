@@ -1,8 +1,10 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
-namespace WebsiteE_Commerce.Data;
-
-public class ApplicationUser : IdentityUser
+namespace WebsiteE_Commerce.Models // Đổi namespace cho đúng với dự án của bạn
 {
-  // Có thể mở rộng
+    public class ApplicationUser : IdentityUser
+    {
+        public string HoVaTen { get; set; }
+        public string DiaChi { get; set; }
+    }
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebsiteE_Commerce.Data;
 namespace WebsiteE_Commerce.Data;
+using WebsiteE_Commerce.Models;
 
 public partial class QuanLyHangHoaContext : IdentityDbContext<ApplicationUser>
 {

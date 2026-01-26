@@ -1,41 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema; // Cần cho [NotMapped]
+using Microsoft.AspNetCore.Http; // Cần cho IFormFile
 
-namespace WebsiteE_Commerce.Data;
-
-public partial class HangHoa
+namespace WebsiteE_Commerce.Data
 {
-    public int MaHh { get; set; }
+    public partial class HangHoa
+    {
+        public int MaHh { get; set; }
+        public string TenHh { get; set; } = null!;
+        public string? TenAlias { get; set; }
+        public int MaLoai { get; set; }
+        public string? MoTaDonVi { get; set; }
+        public double? DonGia { get; set; }
+        public string? Hinh { get; set; } // Tên file hình lưu DB
+        public DateTime NgaySx { get; set; }
+        public double GiamGia { get; set; }
+        public int SoLanXem { get; set; }
+        public string? MoTa { get; set; }
+        public string MaNcc { get; set; } = null!;
 
-    public string TenHh { get; set; } = null!;
+        // --- THUỘC TÍNH MỞ RỘNG ĐỂ UPLOAD ---
+        [NotMapped]
+        public IFormFile? ImageFile { get; set; }
+        // ------------------------------------
 
-    public string? TenAlias { get; set; }
-
-    public int MaLoai { get; set; }
-
-    public string? MoTaDonVi { get; set; }
-
-    public double? DonGia { get; set; }
-
-    public string? Hinh { get; set; }
-
-    public DateTime NgaySx { get; set; }
-
-    public double GiamGia { get; set; }
-
-    public int SoLanXem { get; set; }
-
-    public string? MoTa { get; set; }
-
-    public string MaNcc { get; set; } = null!;
-
-    public virtual ICollection<BanBe> BanBes { get; set; } = new List<BanBe>();
-
-    public virtual ICollection<ChiTietHd> ChiTietHds { get; set; } = new List<ChiTietHd>();
-
-    public virtual Loai MaLoaiNavigation { get; set; } = null!;
-
-    public virtual NhaCungCap MaNccNavigation { get; set; } = null!;
-
-    public virtual ICollection<YeuThich> YeuThiches { get; set; } = new List<YeuThich>();
+        public virtual ICollection<BanBe> BanBes { get; set; } = new List<BanBe>();
+        public virtual ICollection<ChiTietHd> ChiTietHds { get; set; } = new List<ChiTietHd>();
+        public virtual Loai MaLoaiNavigation { get; set; } = null!;
+        public virtual NhaCungCap MaNccNavigation { get; set; } = null!;
+        public virtual ICollection<YeuThich> YeuThiches { get; set; } = new List<YeuThich>();
+    }
 }

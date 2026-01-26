@@ -23,15 +23,45 @@
 
                 <div class="collapse navbar-collapse" id="navbarsFurni">
                     <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li><a class="nav-link" href="Shop">Shop</a></li>
-                        <li><a class="nav-link" href="#">About us</a></li>
-                        <li><a class="nav-link" href="#">Contact us</a></li>
+                        <li class="nav-item active">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="HangHoa" asp-action="Index">Shop</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="#">About us</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Contact us</a></li>
                     </ul>
 
-                    <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-                        <li><a class="nav-link" asp-controller="Account" asp-action="Login"><img src="~/images/user.svg"></a></li>
-                        <li><a class="nav-link" href="#"><img src="~/images/cart.svg"></a></li>
+                    <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5 align-items-center">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            // --- TRƯỜNG HỢP ĐÃ ĐĂNG NHẬP ---
+                            <li class="nav-item me-3">
+                                <span class="text-white small">Xin chào, <strong>@User.Identity.Name</strong></span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" asp-controller="Account" asp-action="Logout" title="Đăng xuất">
+                                    <i class="fa-solid fa-right-from-bracket"></i> (Logout)
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            // --- TRƯỜNG HỢP CHƯA ĐĂNG NHẬP ---
+                            <li class="nav-item me-2">
+                                <a class="nav-link text-white" asp-controller="Account" asp-action="Register" style="font-size: 14px;">Đăng ký</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login" title="Đăng nhập">
+                                    <img src="~/images/user.svg">
+                                </a>
+                            </li>
+                        }
+
+                        <li class="nav-item ms-3">
+                            <a class="nav-link" href="#"><img src="~/images/cart.svg"></a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -43,12 +73,18 @@
     </main>
 
     <footer class="footer-section">
+        <div class="container relative">
+            <div class="row g-5 mb-5">
+                <div class="col-lg-4">
+                    <div class="mb-4 footer-logo-wrap"><a href="#" class="footer-logo">Furni<span>.</span></a></div>
+                    <p class="mb-4">Donec facilisis quam ut purus rutrum lobortis. Donec vitae odio quis nisl dapibus malesuada.</p>
+                </div>
+            </div>
+        </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
     <script src="~/js/tiny-slider.js"></script>
     <script src="~/js/custom.js"></script>
