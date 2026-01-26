@@ -1,0 +1,13 @@
+@model string[]
+
+<h2>Recovery Codes</h2>
+<p>Hãy lưu các mã sau (chỉ hiển thị 1 lần):</p>
+
+<ul>
+@foreach (var c in Model)
+{
+    <li><code>@c</code></li>
+}
+</ul>
+
+<a asp-action="Index">Về trang quản lý</a>
