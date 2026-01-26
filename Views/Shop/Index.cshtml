@@ -116,19 +116,19 @@
                         <span class="search-icon">🔍</span>
                         <input type="text"
                                class="search-input"
-                               placeholder="Tìm kiếm "
+                               placeholder="Search "
                                id="searchInput"
                                autocomplete="off">
                         <button class="clear-btn" id="clearBtn">✕</button>
-                        <button class="search-btn" id="searchBtn">Tìm kiếm</button>
+                        <button class="search-btn" id="searchBtn">Search</button>
                     </div>
                 </div>
 
                 <!-- Phần các ô danh mục -->
                 <div class="category-tabs-container mt-4">
-                    <h5 class="mb-3">Danh mục sản phẩm</h5>
+                    <h5 class="mb-3">Category</h5>
                     <div class="category-tabs" id="categoryTabs">
-                        <div class="category-tab active" data-category="">Tất cả</div>
+                        <div class="category-tab active" data-category="">All</div>
                         @if (ViewBag.Categories != null)
                         {
                             @foreach (var category in ViewBag.Categories)
@@ -142,12 +142,12 @@
                 <!-- Phần sắp xếp (giữ nguyên) -->
                 <div class="filters mt-4">
                     <div class="filter-group">
-                        <label class="filter-label">Sắp xếp</label>
+                        <label class="filter-label">Sort</label>
                         <select id="priceSort">
-                            <option value="">Mặc định</option>
-                            <option value="asc">Giá tăng dần</option>
-                            <option value="desc">Giá giảm dần</option>
-                            <option value="newest">Mới nhất</option>
+                            <option value="">Defaust</option>
+                            <option value="asc">Price: Low to High</option>
+                            <option value="desc">Price: High to Low</option>
+                            <option value="newest">Newest</option>
                         </select>
                     </div>
                 </div>
