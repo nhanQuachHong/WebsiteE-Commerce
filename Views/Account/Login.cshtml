@@ -5,34 +5,41 @@
 
 <h2>Đăng nhập</h2>
 
-<form asp-controller="Account" asp-action="Login" method="post">
-    @Html.AntiForgeryToken()
+@if (TempData["Info"] != null)
+{
+    <p>@TempData["Info"]</p>
+}
 
+<form asp-action="Login" method="post">
+    @Html.AntiForgeryToken()
     <input type="hidden" asp-for="ReturnUrl" />
 
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div>
         <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" autocomplete="username" />
+        <input asp-for="Email" autocomplete="username" />
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
 
     <div>
         <label asp-for="Password"></label>
-        <input asp-for="Password" class="form-control" autocomplete="current-password" />
+        <input asp-for="Password" autocomplete="current-password" />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
 
     <div>
-        <label>
-            <input asp-for="RememberMe" />
-            Ghi nhớ đăng nhập
-        </label>
+        <label><input asp-for="RememberMe" /> Ghi nhớ</label>
     </div>
 
-    <button type="submit" class="btn btn-primary">Đăng nhập</button>
+    <button type="submit">Đăng nhập</button>
 </form>
+
+<p>
+    <a asp-action="ForgotPassword">Quên mật khẩu?</a> |
+    <a asp-action="ResendEmailConfirmation">Gửi lại email xác thực</a> |
+    <a asp-action="Register">Đăng ký</a>
+</p>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
