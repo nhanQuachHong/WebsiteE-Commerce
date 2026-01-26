@@ -1,34 +1,36 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebsiteE_Commerce.Data;
 using WebsiteE_Commerce.Models;
+using WebsiteE_Commerce.Security;
+using WebsiteE_Commerce.Services.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MVC
 builder.Services.AddControllersWithViews();
 
-// DbContext cho Identity
+// DbContext Identity
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    // Nếu dùng SQL Server:
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-
-    // Nếu dùng provider khác (SQLite/MySQL...) thì thay UseSqlServer bằng UseSqlite / UseMySql...
 });
 
-// Identity + Roles
+// Identity + Roles + Token providers (email confirm / reset password / 2FA)
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
-        // Password policy (có thể nới lỏng cho đồ án, nhưng khuyến nghị giữ mức tối thiểu)
+        // Bắt buộc xác thực email trước khi đăng nhập
+        options.SignIn.RequireConfirmedEmail = true;
+
+        // Password policy (có thể điều chỉnh theo tiêu chí đồ án)
         options.Password.RequireDigit = true;
         options.Password.RequireLowercase = true;
         options.Password.RequireUppercase = true;
         options.Password.RequireNonAlphanumeric = true;
         options.Password.RequiredLength = 8;
 
-        // Lockout khi đăng nhập sai nhiều lần (chống brute-force)
+        // Lockout chống brute-force
         options.Lockout.AllowedForNewUsers = true;
         options.Lockout.MaxFailedAccessAttempts = 5;
         options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
@@ -39,7 +41,7 @@ builder.Services
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// Cookie config (Identity mặc định dùng cookie)
+// Cookie config
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
@@ -48,11 +50,25 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.Name = "WebsiteECommerce.Auth";
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Dev: SameAsRequest; Production: Always
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Production: Always
 
     options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     options.SlidingExpiration = true;
 });
+
+// Authorization Policy: Admin bắt buộc bật 2FA mới truy cập admin
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin2FA", policy =>
+    {
+        policy.RequireRole(AppRoles.Admin);
+        policy.AddRequirements(new RequireTwoFactorEnabledRequirement());
+    });
+});
+builder.Services.AddScoped<IAuthorizationHandler, RequireTwoFactorEnabledHandler>();
+
+// Email sender (dev: log console). Bạn có thể thay bằng SMTP sender nếu cần.
+builder.Services.AddTransient<IAppEmailSender, ConsoleEmailSender>();
 
 var app = builder.Build();
 
@@ -68,11 +84,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// Quan trọng: Authentication phải đứng trước Authorization
+// Quan trọng: Authentication trước Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Seed roles + admin mặc định
+// Seed roles + admin
 await IdentitySeedData.SeedAsync(app);
 
 app.MapControllerRoute(
