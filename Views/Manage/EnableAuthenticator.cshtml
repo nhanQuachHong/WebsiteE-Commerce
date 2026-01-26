@@ -1,0 +1,26 @@
+@model WebsiteE_Commerce.Models.ViewModels.Manage.EnableAuthenticatorViewModel
+
+<h2>Bật xác thực 2 lớp (Authenticator)</h2>
+
+<p><strong>Shared Key:</strong> @Model.SharedKey</p>
+<p><strong>OTP URI (để tạo QR hoặc nhập tay):</strong></p>
+<pre>@Model.AuthenticatorUri</pre>
+
+<p>Hãy mở Google Authenticator/Microsoft Authenticator, thêm tài khoản mới bằng key/URI ở trên, sau đó nhập mã 6 số:</p>
+
+<form asp-action="EnableAuthenticator" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div>
+        <label asp-for="Code"></label>
+        <input asp-for="Code" autocomplete="one-time-code" />
+        <span asp-validation-for="Code"></span>
+    </div>
+
+    <button type="submit">Xác nhận bật 2FA</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
