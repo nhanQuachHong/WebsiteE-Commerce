@@ -1,0 +1,13 @@
+@model WebsiteE_Commerce.Models.ViewModels.Account.ForgotPasswordViewModel
+
+<h2>Gửi lại email xác thực</h2>
+
+<form asp-action="ResendEmailConfirmation" method="post">
+    @Html.AntiForgeryToken()
+    <div>
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email"></span>
+    </div>
+    <button type="submit">Gửi</button>
+</form>
