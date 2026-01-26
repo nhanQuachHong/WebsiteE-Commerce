@@ -1,0 +1,20 @@
+@if (User?.Identity?.IsAuthenticated == true)
+{
+    <a asp-controller="Manage" asp-action="Index">Tài khoản</a>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-controller="Admin" asp-action="Index">Admin</a>
+        <a asp-controller="AdminUsers" asp-action="Index">Quản trị User</a>
+    }
+
+    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+        @Html.AntiForgeryToken()
+        <button type="submit">Đăng xuất</button>
+    </form>
+}
+else
+{
+    <a asp-controller="Account" asp-action="Login">Đăng nhập</a>
+    <a asp-controller="Account" asp-action="Register">Đăng ký</a>
+}
