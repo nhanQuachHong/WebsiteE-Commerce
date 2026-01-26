@@ -1,0 +1,25 @@
+@model WebsiteE_Commerce.Models.ViewModels.Account.LoginWithRecoveryCodeViewModel
+@{
+    ViewData["Title"] = "Đăng nhập bằng Recovery Code";
+}
+
+<h2>Đăng nhập bằng Recovery Code</h2>
+
+<form asp-action="LoginWithRecoveryCode" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ReturnUrl" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div>
+        <label asp-for="RecoveryCode"></label>
+        <input asp-for="RecoveryCode" />
+        <span asp-validation-for="RecoveryCode" class="text-danger"></span>
+    </div>
+
+    <button type="submit">Đăng nhập</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
