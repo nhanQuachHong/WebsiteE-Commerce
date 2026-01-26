@@ -1,0 +1,21 @@
+<h2>Quản lý tài khoản</h2>
+
+@if (TempData["Info"] != null)
+{
+    <p>@TempData["Info"]</p>
+}
+
+<ul>
+    <li><a asp-action="ChangePassword">Đổi mật khẩu</a></li>
+    <li><a asp-action="EnableAuthenticator">Bật 2FA (Authenticator)</a></li>
+</ul>
+
+<form asp-action="Disable2fa" method="post">
+    @Html.AntiForgeryToken()
+    <button type="submit">Tắt 2FA</button>
+</form>
+
+<form asp-action="ResetAuthenticatorKey" method="post">
+    @Html.AntiForgeryToken()
+    <button type="submit">Reset Authenticator Key</button>
+</form>
