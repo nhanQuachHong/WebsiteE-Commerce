@@ -1,6 +1,3 @@
-@{
-    ViewData["Title"] = "Từ chối truy cập";
-}
-
 <h2>Từ chối truy cập</h2>
-<p>Bạn không có quyền truy cập chức năng này.</p>
+<p>Bạn không có quyền truy cập chức năng này. Nếu bạn là Admin, vui lòng bật 2FA trong trang quản lý tài khoản.</p>
+<a asp-controller="Manage" asp-action="EnableAuthenticator">Bật 2FA</a>
