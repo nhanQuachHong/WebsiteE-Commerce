@@ -1,0 +1,32 @@
+@model WebsiteE_Commerce.Models.ViewModels.Account.LoginWith2faViewModel
+@{
+    ViewData["Title"] = "Xác thực 2 lớp";
+}
+
+<h2>Xác thực 2 lớp</h2>
+
+<form asp-action="LoginWith2fa" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ReturnUrl" />
+    <input type="hidden" asp-for="RememberMe" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div>
+        <label asp-for="TwoFactorCode"></label>
+        <input asp-for="TwoFactorCode" autocomplete="one-time-code" />
+        <span asp-validation-for="TwoFactorCode" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label><input asp-for="RememberMachine" /> Tin cậy thiết bị này</label>
+    </div>
+
+    <button type="submit">Xác nhận</button>
+</form>
+
+<p><a asp-action="LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">Dùng Recovery Code</a></p>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
