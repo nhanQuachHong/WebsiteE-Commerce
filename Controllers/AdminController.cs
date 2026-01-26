@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[Authorize(Roles = "Admin")]
-public class AdminController : Controller
+namespace WebsiteE_Commerce.Controllers
 {
-    public IActionResult Index()
+    [Authorize(Roles = "Admin")]
+    public class AdminController : Controller
     {
-        return View();
+        public IActionResult Index()
+        {
+            return View();
+        }
     }
 }
