@@ -1,0 +1,48 @@
+@model List<WebsiteE_Commerce.Models.ViewModels.Admin.AdminUserListItemViewModel>
+
+<h2>Quản trị người dùng</h2>
+
+@if (TempData["Info"] != null)
+{
+    <p>@TempData["Info"]</p>
+}
+
+<p><a asp-action="Create">Tạo tài khoản (User/Seller)</a></p>
+
+<table border="1" cellpadding="6">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>EmailConfirmed</th>
+            <th>2FA</th>
+            <th>Roles</th>
+            <th>Lockout</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var u in Model)
+    {
+        <tr>
+            <td>@u.Email</td>
+            <td>@u.EmailConfirmed</td>
+            <td>@u.TwoFactorEnabled</td>
+            <td>@string.Join(", ", u.Roles)</td>
+            <td>@(u.IsLockedOut ? $"Locked until {u.LockoutEnd}" : "OK")</td>
+            <td>
+                <a asp-action="EditRoles" asp-route-id="@u.Id">Sửa role</a>
+
+                <form asp-action="Lock" asp-route-id="@u.Id" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit">Khóa</button>
+                </form>
+
+                <form asp-action="Unlock" asp-route-id="@u.Id" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit">Mở khóa</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
