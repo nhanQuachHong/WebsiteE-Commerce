@@ -13,14 +13,14 @@ namespace WebsiteE_Commerce.Controllers
             _context = context;
         }
 
-        [HttpGet]
+       [HttpGet]
 public async Task<IActionResult> GetProducts(string? search, int? category, string? sort)
 {
     var query = _context.HangHoas
         .Include(h => h.MaLoaiNavigation)
         .AsQueryable();
 
-    // Tìm kiếm theo tên
+    // Xử lý search (quan trọng!)
     if (!string.IsNullOrEmpty(search))
     {
         query = query.Where(h => 
@@ -29,13 +29,13 @@ public async Task<IActionResult> GetProducts(string? search, int? category, stri
         );
     }
 
-    // Lọc theo danh mục
+    // Xử lý category
     if (category.HasValue)
     {
         query = query.Where(h => h.MaLoai == category.Value);
     }
 
-    // Sắp xếp
+    // Xử lý sort
     query = sort switch
     {
         "asc" => query.OrderBy(h => h.DonGia),
