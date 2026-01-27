@@ -4,8 +4,8 @@ const clearBtn = document.getElementById('clearBtn');
 const searchBtn = document.getElementById('searchBtn');
 const suggestions = document.getElementById('suggestions');
 const priceSort = document.getElementById('priceSort');
-const productList = document.getElementById('productList'); // THÊM DÒNG NÀY
-const loadingSpinner = document.getElementById('loadingSpinner'); // THÊM DÒNG NÀY
+const productList = document.getElementById('productList');
+const loadingSpinner = document.getElementById('loadingSpinner');
 
 let debounceTimer;
 let currentCategory = '';
