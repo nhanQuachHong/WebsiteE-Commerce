@@ -47,6 +47,40 @@ public async Task<IActionResult> GetProducts(string? search, int? category, stri
     var products = await query.ToListAsync();
     return PartialView("_ProductListPartial", products);
 }
+    [HttpGet]
+public async Task<IActionResult> SearchAndSort(string? search, int? category, string? sort)
+{
+    var query = _context.HangHoas
+        .Include(h => h.MaLoaiNavigation)
+        .AsQueryable();
+
+    // Tìm kiếm theo tên
+    if (!string.IsNullOrEmpty(search))
+    {
+        query = query.Where(h => 
+            h.TenHh.Contains(search) || 
+            (h.TenAlias != null && h.TenAlias.Contains(search))
+        );
+    }
+
+    // Lọc theo danh mục
+    if (category.HasValue)
+    {
+        query = query.Where(h => h.MaLoai == category.Value);
+    }
+
+    // Sắp xếp
+    query = sort switch
+    {
+        "asc" => query.OrderBy(h => h.DonGia),
+        "desc" => query.OrderByDescending(h => h.DonGia),
+        "newest" => query.OrderByDescending(h => h.MaHh),
+        _ => query.OrderBy(h => h.TenHh)
+    };
+
+    var products = await query.ToListAsync();
+    return PartialView("_ProductListPartial", products);
+}
         // GET: /Shop hoặc /Shop/Index
         public async Task<IActionResult> Index(string? search, int? category, string? sort)
         {

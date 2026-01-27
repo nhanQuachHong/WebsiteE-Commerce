@@ -188,128 +188,192 @@
     <script src="~/js/search.js"></script>
     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Biến để lưu trạng thái hiện tại
-            let currentCategory = '';
-            let currentSort = '';
+    document.addEventListener('DOMContentLoaded', function() {
+        // Biến toàn cục
+        let currentSearch = '';
+        let currentCategory = '';
+        let currentSort = '';
+        
+        // Các elements
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const priceSort = document.getElementById('priceSort');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const productList = document.getElementById('productList');
+        const clearBtn = document.getElementById('clearBtn');
+        
+        // ===== 1. XỬ LÝ SEARCH (AJAX) =====
+        function handleSearch() {
+            currentSearch = searchInput.value.trim();
             
-            // Xử lý các ô danh mục - AJAX
-            const categoryTabs = document.querySelectorAll('.category-tab');
-            const priceSort = document.getElementById('priceSort');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const productList = document.getElementById('productList');
+            // Cập nhật URL
+            updateUrlParams();
             
-            // Cập nhật URL mà không reload (chỉ để hiển thị)
-            function updateUrlParams() {
-                const params = new URLSearchParams();
-                if (currentCategory) params.set('category', currentCategory);
-                if (currentSort) params.set('sort', currentSort);
-                const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
-                window.history.pushState({}, '', newUrl);
-            }
-            
-            // Load sản phẩm bằng AJAX
-            function loadProducts() {
-                productList.classList.add('loading');
-                loadingSpinner.style.display = 'block';
-                
-                const params = new URLSearchParams();
-                if (currentCategory) params.append('category', currentCategory);
-                if (currentSort) params.append('sort', currentSort);
-                
-                fetch(`/Shop/GetProducts?${params.toString()}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.text();
-                    })
-                    .then(html => {
-                        productList.innerHTML = html;
-                        productList.classList.remove('loading');
-                        loadingSpinner.style.display = 'none';
-                    })
-                    .catch(error => {
-                        console.error('Error loading products:', error);
-                        productList.innerHTML = '<div class="col-12 text-center py-5"><p class="text-muted fs-5">Có lỗi xảy ra khi tải sản phẩm.</p></div>';
-                        productList.classList.remove('loading');
-                        loadingSpinner.style.display = 'none';
-                    });
-            }
-            
-            // Xử lý click vào danh mục
-            categoryTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Xóa active khỏi tất cả các tab
-                    categoryTabs.forEach(t => t.classList.remove('active'));
-                    
-                    // Thêm active vào tab được click
-                    this.classList.add('active');
-                    
-                    // Lấy giá trị category
-                    currentCategory = this.getAttribute('data-category');
-                    
-                    // Cập nhật URL
-                    updateUrlParams();
-                    
-                    // Load sản phẩm
-                    loadProducts();
-                });
+            // Load sản phẩm
+            loadProducts();
+        }
+        
+        // Nút search
+        if (searchBtn) {
+            searchBtn.addEventListener('click', handleSearch);
+        }
+        
+        // Enter để search
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleSearch();
+                }
             });
-            
-            // Xử lý sắp xếp
-            if (priceSort) {
-                priceSort.addEventListener('change', function() {
-                    currentSort = this.value;
-                    updateUrlParams();
-                    loadProducts();
-                });
-            }
-            
-            // Kiểm tra nếu có tham số category từ URL (khi từ trang home chuyển sang)
-            const urlParams = new URLSearchParams(window.location.search);
-            const categoryFromUrl = urlParams.get('category');
-            const sortFromUrl = urlParams.get('sort');
-            
-            if (categoryFromUrl) {
-                // Tìm và kích hoạt tab tương ứng
-                const targetTab = document.querySelector(`.category-tab[data-category="${categoryFromUrl}"]`);
-                if (targetTab) {
-                    categoryTabs.forEach(t => t.classList.remove('active'));
-                    targetTab.classList.add('active');
-                    currentCategory = categoryFromUrl;
-                }
-            }
-            
-            if (sortFromUrl && priceSort) {
-                priceSort.value = sortFromUrl;
-                currentSort = sortFromUrl;
-            }
-            
-            // Xử lý khi nhấn nút back/forward
-            window.addEventListener('popstate', function() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const category = urlParams.get('category') || '';
-                const sort = urlParams.get('sort') || '';
+        }
+        
+        // ===== 2. XỬ LÝ CATEGORY TABS =====
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Update active tab
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
                 
-                // Cập nhật giao diện
-                categoryTabs.forEach(tab => {
-                    const tabCategory = tab.getAttribute('data-category');
-                    if (tabCategory === category) {
-                        tab.classList.add('active');
-                    } else {
-                        tab.classList.remove('active');
-                    }
-                });
+                // Lấy category
+                currentCategory = this.getAttribute('data-category');
                 
-                if (priceSort && sort) {
-                    priceSort.value = sort;
-                }
-                
-                // Load sản phẩm
-                currentCategory = category;
-                currentSort = sort;
+                // Cập nhật URL và load sản phẩm
+                updateUrlParams();
                 loadProducts();
             });
         });
-    </script>
+        
+        // ===== 3. XỬ LÝ SORT =====
+        if (priceSort) {
+            priceSort.addEventListener('change', function() {
+                currentSort = this.value;
+                updateUrlParams();
+                loadProducts();
+            });
+        }
+        
+        // ===== 4. HÀM LOAD SẢN PHẨM (AJAX) =====
+        function loadProducts() {
+            productList.classList.add('loading');
+            if (loadingSpinner) loadingSpinner.style.display = 'block';
+            
+            const params = new URLSearchParams();
+            if (currentSearch) params.append('search', currentSearch);
+            if (currentCategory) params.append('category', currentCategory);
+            if (currentSort) params.append('sort', currentSort);
+            
+            // Gọi API tích hợp search + sort
+            fetch(`/Shop/SearchAndSort?${params.toString()}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error');
+                    return response.text();
+                })
+                .then(html => {
+                    productList.innerHTML = html;
+                    productList.classList.remove('loading');
+                    if (loadingSpinner) loadingSpinner.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    productList.innerHTML = '<div class="col-12 text-center py-5"><p class="text-muted fs-5">Có lỗi xảy ra.</p></div>';
+                    productList.classList.remove('loading');
+                    if (loadingSpinner) loadingSpinner.style.display = 'none';
+                });
+        }
+        
+        // ===== 5. CẬP NHẬT URL PARAMS =====
+        function updateUrlParams() {
+            const params = new URLSearchParams();
+            if (currentSearch) params.set('search', currentSearch);
+            if (currentCategory) params.set('category', currentCategory);
+            if (currentSort) params.set('sort', currentSort);
+            
+            const newUrl = `/Shop${params.toString() ? '?' + params.toString() : ''}`;
+            window.history.pushState({}, '', newUrl);
+        }
+        
+        // ===== 6. XỬ LÝ NÚT CLEAR =====
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                currentSearch = '';
+                clearBtn.style.display = 'none';
+                
+                // Reset về tab "All"
+                if (categoryTabs.length > 0) {
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    categoryTabs[0].classList.add('active');
+                    currentCategory = '';
+                }
+                
+                // Reset sort
+                if (priceSort) {
+                    priceSort.value = '';
+                    currentSort = '';
+                }
+                
+                updateUrlParams();
+                loadProducts();
+            });
+        }
+        
+        // Hiển thị nút clear khi có nội dung
+        if (searchInput && clearBtn) {
+            searchInput.addEventListener('input', function() {
+                clearBtn.style.display = this.value ? 'block' : 'none';
+            });
+        }
+        
+        // ===== 7. LOAD TRANG ĐẦU TIÊN HOẶC TỪ URL =====
+        function initializeFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Lấy search từ URL
+            if (urlParams.has('search')) {
+                currentSearch = urlParams.get('search');
+                if (searchInput) {
+                    searchInput.value = currentSearch;
+                    if (clearBtn) clearBtn.style.display = 'block';
+                }
+            }
+            
+            // Lấy category từ URL và active tab tương ứng
+            if (urlParams.has('category')) {
+                currentCategory = urlParams.get('category');
+                const targetTab = document.querySelector(`.category-tab[data-category="${currentCategory}"]`);
+                if (targetTab) {
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    targetTab.classList.add('active');
+                }
+            } else {
+                // Nếu không có category trong URL, active tab "All"
+                const allTab = document.querySelector('.category-tab[data-category=""]');
+                if (allTab) {
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    allTab.classList.add('active');
+                    currentCategory = '';
+                }
+            }
+            
+            // Lấy sort từ URL
+            if (urlParams.has('sort')) {
+                currentSort = urlParams.get('sort');
+                if (priceSort) priceSort.value = currentSort;
+            }
+            
+            // Load sản phẩm đầu tiên
+            loadProducts();
+        }
+        
+        // Khởi tạo từ URL
+        initializeFromUrl();
+        
+        // ===== 8. XỬ LÝ NÚT BACK/FORWARD =====
+        window.addEventListener('popstate', function() {
+            initializeFromUrl();
+        });
+    });
+</script>
 </body>
 </html>
