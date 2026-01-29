@@ -1,3 +1,4 @@
+@using Microsoft.CodeAnalysis.Differencing
 @model IEnumerable<WebsiteE_Commerce.Data.HangHoa>
 
 @{
@@ -21,65 +22,216 @@
     <link href="~/css/style.css" rel="stylesheet">
     <link href="~/css/search.css" rel="stylesheet">
     <title>@ViewData["Title"]</title>
-    <style>
-        /* CSS cho các ô danh mục */
-        .category-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .category-tab {
-            padding: 8px 16px;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            color: #495057;
-        }
-        
-        .category-tab:hover {
-            background-color: #e9ecef;
-            transform: translateY(-2px);
-        }
-        
-        .category-tab.active {
-            background-color: #0d6efd;
-            color: white;
-            border-color: #0d6efd;
-        }
-        
-        /* Loading spinner */
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #0d6efd;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        
-        
-        
-        /* Hiệu ứng chuyển tiếp cho sản phẩm */
-        #productList {
-            transition: opacity 0.3s ease;
-        }
-        
-        #productList.loading {
-            opacity: 0.5;
-        }
-    </style>
+   <style>
+    .untree_co-section.product-section .container {
+    max-width: 1200px; /* Cùng width với search container */
+    margin: 0 auto; /* Căn giữa */
+    padding-left: 15px; /* Giống Bootstrap */
+    padding-right: 15px; /* Giống Bootstrap */
+}
+
+#productList {
+    margin-left: 0;
+    padding-left: 0;
+    justify-content: flex-start; /* Căn trái đều */
+}
+
+/* Hoặc đơn giản hơn: reset lại Bootstrap grid */
+#productList.row {
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+#productList.row > .col-12 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+    /* ========== FIX LAYOUT SẢN PHẨM ========== */
+    #productList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    #productList > .col-12 {
+        flex: 0 0 calc(25% - 20px); /* 4 cột trên desktop */
+        max-width: calc(25% - 20px);
+        margin-bottom: 0;
+        display: flex;
+    }
+    
+    }
+    
+    /* Card sản phẩm */
+    .product-item {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+        text-decoration: none;
+        color: inherit;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #f0f0f0;
+    }
+    
+    .product-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        border-color: #0d6efd;
+    }
+    
+    /* Container ảnh - Cố định chiều cao */
+    .product-thumbnail-wrapper {
+        position: relative;
+        width: 100%;
+        height: 220px;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    
+    .product-thumbnail {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.5s ease;
+    }
+    
+    .product-item:hover .product-thumbnail {
+        transform: scale(1.08);
+    }
+    
+    /* Nội dung sản phẩm */
+    .product-content {
+        padding: 20px 15px 15px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .product-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        line-height: 1.4;
+        color: #333;
+        flex-grow: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .product-price {
+        font-size: 18px;
+        color: #0d6efd;
+        font-weight: 700;
+        margin-top: 10px;
+        display: block;
+    }
+    
+    /* Icon cross */
+    .icon-cross {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        background: white;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .product-item:hover .icon-cross {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .icon-cross img {
+        width: 16px;
+        height: 16px;
+    }
+    
+    /* Fallback khi không có ảnh */
+    .product-thumbnail-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        z-index: -1;
+    }
+    
+    /* ========== CSS CŨ GIỮ NGUYÊN ========== */
+    
+    /* CSS cho các ô danh mục */
+    .category-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .category-tab {
+        padding: 8px 16px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        color: #495057;
+    }
+    
+    .category-tab:hover {
+        background-color: #e9ecef;
+        transform: translateY(-2px);
+    }
+    
+    .category-tab.active {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+    
+    /* Loading spinner */
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #0d6efd;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+    }
+    
+    /* Hiệu ứng chuyển tiếp cho sản phẩm */
+    #productList.loading {
+        opacity: 0.5;
+    }
+    
+    /* Animation cho spinner */
+   
+</style>
 </head>
 
 <body>
@@ -144,7 +296,7 @@
                     <div class="filter-group">
                         <label class="filter-label">Sort</label>
                         <select id="priceSort">
-                            <option value="">Defaust</option>
+                            <option value="">Default</option>
                             <option value="asc">Price: Low to High</option>
                             <option value="desc">Price: High to Low</option>
                             <option value="newest">Newest</option>
